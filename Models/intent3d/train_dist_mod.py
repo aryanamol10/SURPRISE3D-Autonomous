@@ -58,7 +58,12 @@ class TrainTester(BaseTrainTester):
                 data_path=args.data_root,
                 detect_intermediate=args.detect_intermediate,
                 butd=args.butd,
-                augment_det=args.augment_det
+                augment_det=args.augment_det,
+                use_video=args.use_video_encoder,
+                video_feature_root=args.video_feature_root,
+                video_input_dim=args.video_input_dim,
+                video_num_points=args.video_num_points,
+                video_distance_classes=args.video_distance_classes,
             )
         
         test_dataset = Joint3DDataset(
@@ -70,6 +75,11 @@ class TrainTester(BaseTrainTester):
             data_path=args.data_root,
             detect_intermediate=args.detect_intermediate,
             butd=args.butd,
+            use_video=args.use_video_encoder,
+            video_feature_root=args.video_feature_root,
+            video_input_dim=args.video_input_dim,
+            video_num_points=args.video_num_points,
+            video_distance_classes=args.video_distance_classes,
         )
         return train_dataset, test_dataset
 
@@ -97,7 +107,12 @@ class TrainTester(BaseTrainTester):
             butd=args.butd or args.butd_gt or args.butd_cls,
             pointnet_ckpt=args.pp_checkpoint,
             data_path = args.data_root,
-            self_attend=args.self_attend
+            self_attend=args.self_attend,
+            use_video_encoder=args.use_video_encoder,
+            video_input_dim=args.video_input_dim,
+            video_hidden_dim=args.video_hidden_dim,
+            video_num_layers=args.video_num_layers,
+            video_distance_classes=args.video_distance_classes,
         )
         return model
 
@@ -110,7 +125,12 @@ class TrainTester(BaseTrainTester):
             'point_instance_label': batch_data['point_instance_label'], # ([B, 50000])  instance label
             "det_boxes": batch_data['all_detected_boxes'],      # ([B, 132, 6]) groupfree detection boxes
             "det_bbox_label_mask": batch_data['all_detected_bbox_label_mask'],  # ([B, 132]) mask
-            "det_class_ids": batch_data['all_detected_class_ids']   # ([B, 132])  box id
+            "det_class_ids": batch_data['all_detected_class_ids'],   # ([B, 132])  box id
+            "video_features": batch_data['video_features'],
+            "video_feature_mask": batch_data['video_feature_mask'],
+            "video_timestamps": batch_data['video_timestamps'],
+            "video_distance_labels": batch_data['video_distance_labels'],
+            "video_distance_mask": batch_data['video_distance_mask'],
         }
 
 

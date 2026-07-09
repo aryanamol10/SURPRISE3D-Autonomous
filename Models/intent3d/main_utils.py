@@ -70,6 +70,13 @@ def parse_option():
     parser.add_argument('--butd_gt', action='store_true')
     parser.add_argument('--butd_cls', action='store_true')
     parser.add_argument('--augment_det', action='store_true')
+    parser.add_argument('--use_video_encoder', action='store_true')
+    parser.add_argument('--video_feature_root', default=None)
+    parser.add_argument('--video_input_dim', type=int, default=256)
+    parser.add_argument('--video_hidden_dim', type=int, default=256)
+    parser.add_argument('--video_num_layers', type=int, default=2)
+    parser.add_argument('--video_num_points', type=int, default=16)
+    parser.add_argument('--video_distance_classes', type=int, default=8)
     parser.add_argument('--num_workers', type=int, default=4)
 
     # Training

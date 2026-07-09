@@ -20,6 +20,7 @@ from .modules import (
     PointsObjClsModule, GeneralSamplingModule,
     ClsAgnosticPredictHead, PositionEmbeddingLearned
 )
+from .video_encoder import VideoEncoder
 from .encoder_decoder_layers import (
     BiEncoder, BiEncoderLayer, BiDecoderLayer
 )
@@ -31,7 +32,12 @@ class BeaUTyDETR(nn.Module):
                  num_decoder_layers=6, self_position_embedding='loc_learned',
                  contrastive_align_loss=True,
                  d_model=288, butd=True, pointnet_ckpt=None, data_path=None,
-                 self_attend=True):
+                 self_attend=True,
+                 use_video_encoder=False,
+                 video_input_dim=256,
+                 video_hidden_dim=256,
+                 video_num_layers=2,
+                 video_distance_classes=8):
         """Initialize layers."""
         super().__init__()
 
@@ -39,6 +45,7 @@ class BeaUTyDETR(nn.Module):
         self.num_decoder_layers = num_decoder_layers
         self.self_position_embedding = self_position_embedding
         self.contrastive_align_loss = contrastive_align_loss
+        self.use_video_encoder = use_video_encoder
 
         # Visual encoder
         self.backbone_net = Pointnet2Backbone(
@@ -61,6 +68,25 @@ class BeaUTyDETR(nn.Module):
             nn.LayerNorm(d_model, eps=1e-12),
             nn.Dropout(0.1)
         )
+
+        # Video Encoder
+        if self.use_video_encoder:
+            self.video_encoder = VideoEncoder(
+                input_dim=video_input_dim,
+                d_model=d_model,
+                hidden_dim=video_hidden_dim,
+                num_layers=video_num_layers,
+            )
+            self.video_context_projector = nn.Sequential(
+                nn.Linear(d_model, d_model),
+                nn.LayerNorm(d_model, eps=1e-12),
+                nn.ReLU(inplace=True),
+            )
+            self.video_distance_head = nn.Sequential(
+                nn.Linear(d_model, d_model),
+                nn.ReLU(inplace=True),
+                nn.Linear(d_model, video_distance_classes),
+            )
 
         # Box encoder
         self.butd_class_embeddings = nn.Embedding(num_obj_class, 768)
@@ -173,6 +199,37 @@ class BeaUTyDETR(nn.Module):
         encoded_text = self.text_encoder(**tokenized)
         text_feats = self.text_projector(encoded_text.last_hidden_state)
 
+        if self.use_video_encoder and 'video_features' in inputs:
+            video_mask = inputs.get('video_feature_mask')
+            video_timestamps = inputs.get('video_timestamps')
+            if video_mask is not None and video_mask.any():
+                video_feats, video_pooled = self.video_encoder(
+                    inputs['video_features'],
+                    video_mask=video_mask,
+                    video_timestamps=video_timestamps,
+                )
+                video_distance_logits = self.video_distance_head(video_feats)
+                video_context = self.video_context_projector(video_pooled).unsqueeze(1)
+            else:
+                video_feats = inputs['video_features'].new_zeros(
+                    inputs['video_features'].shape[0],
+                    inputs['video_features'].shape[1],
+                    self.text_projector[0].out_features,
+                )
+                video_context = inputs['video_features'].new_zeros(
+                    inputs['video_features'].shape[0],
+                    1,
+                    self.text_projector[0].out_features,
+                )
+                video_distance_logits = inputs['video_features'].new_zeros(
+                    inputs['video_features'].shape[0],
+                    inputs['video_features'].shape[1],
+                    self.video_distance_head[-1].out_features,
+                )
+            end_points['video_feats'] = video_feats
+            end_points['video_distance_logits'] = video_distance_logits
+            text_feats = text_feats + video_context
+
         # Invert attention mask that we get from huggingface
         # because its the opposite in pytorch transformer
         text_attention_mask = tokenized.attention_mask.ne(1).bool()
@@ -180,6 +237,10 @@ class BeaUTyDETR(nn.Module):
         end_points['text_feats'] = text_feats
         end_points['text_attention_mask'] = text_attention_mask
         end_points['tokenized'] = tokenized
+        if 'video_distance_labels' in inputs:
+            end_points['video_distance_labels'] = inputs['video_distance_labels']
+        if 'video_distance_mask' in inputs:
+            end_points['video_distance_mask'] = inputs['video_distance_mask']
         return end_points
 
     # generate query.

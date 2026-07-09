@@ -49,7 +49,12 @@ class Joint3DDataset(Dataset):
                  data_path='./',
                  use_color=False, 
                  detect_intermediate=False,
-                 butd=False, augment_det=False):
+                 butd=False, augment_det=False,
+                 use_video=False,
+                 video_feature_root=None,
+                 video_input_dim=256,
+                 video_num_points=16,
+                 video_distance_classes=8):
         """Initialize dataset (here for Intent3D utterances)."""
         self.dataset_dict = dataset_dict
         self.test_dataset = test_dataset
@@ -61,6 +66,11 @@ class Joint3DDataset(Dataset):
         self.data_path = data_path
         self.visualize = False  # manually set this to True to debug
         self.augment_det = augment_det
+        self.use_video = use_video
+        self.video_feature_root = video_feature_root
+        self.video_input_dim = video_input_dim
+        self.video_num_points = video_num_points
+        self.video_distance_classes = video_distance_classes
 
         self.mean_rgb = np.array([109.8, 97.2, 83.8]) / 256
         
@@ -431,6 +441,110 @@ class Joint3DDataset(Dataset):
             all_detected_bboxes, all_detected_bbox_label_mask,
             detected_class_ids
         )
+
+    def _sample_video_indices(self, num_frames):
+        if num_frames <= self.video_num_points:
+            return np.arange(num_frames, dtype=np.int64)
+        if self.split == 'train':
+            return np.sort(np.random.choice(num_frames, self.video_num_points, replace=False))
+        return np.linspace(0, num_frames - 1, self.video_num_points).astype(np.int64)
+
+    def _load_video_inputs(self, anno, scan_id):
+        video_features = np.zeros((self.video_num_points, self.video_input_dim), dtype=np.float32)
+        video_feature_mask = np.zeros((self.video_num_points,), dtype=np.bool8)
+        video_timestamps = np.zeros((self.video_num_points,), dtype=np.float32)
+        video_distance_labels = np.full((self.video_num_points,), -100, dtype=np.int64)
+
+        candidate_paths = []
+        if isinstance(anno, dict):
+            for key in ('video_feature_path', 'video_path', 'video_feature_file'):
+                if anno.get(key):
+                    candidate_paths.append(anno[key])
+
+        if self.video_feature_root:
+            candidate_paths.extend([
+                os.path.join(self.video_feature_root, f'{scan_id}.npy'),
+                os.path.join(self.video_feature_root, f'{scan_id}.npz'),
+                os.path.join(self.video_feature_root, f'{scan_id}.pt'),
+            ])
+        candidate_paths.extend([
+            os.path.join(self.data_path, 'video_features', f'{scan_id}.npy'),
+            os.path.join(self.data_path, 'video_features', f'{scan_id}.npz'),
+            os.path.join(self.data_path, 'video_features', f'{scan_id}.pt'),
+        ])
+
+        loaded = None
+        for candidate_path in candidate_paths:
+            if candidate_path and os.path.exists(candidate_path):
+                if candidate_path.endswith('.pt'):
+                    loaded = torch.load(candidate_path, map_location='cpu')
+                else:
+                    loaded = np.load(candidate_path, allow_pickle=True)
+                break
+
+        if loaded is None:
+            raw_features = None
+            raw_timestamps = None
+            raw_labels = None
+        elif isinstance(loaded, dict):
+            raw_features = loaded.get('features', loaded.get('video_features', loaded.get('feat')))
+            raw_timestamps = loaded.get('timestamps', loaded.get('video_timestamps', loaded.get('points')))
+            raw_labels = loaded.get('distance_labels', loaded.get('video_distance_labels', loaded.get('labels')))
+        elif isinstance(loaded, np.lib.npyio.NpzFile):
+            raw_features = loaded.get('features', loaded.get('video_features'))
+            raw_timestamps = loaded.get('timestamps', loaded.get('video_timestamps'))
+            raw_labels = loaded.get('distance_labels', loaded.get('video_distance_labels'))
+        else:
+            raw_features = loaded
+            raw_timestamps = None
+            raw_labels = None
+
+        if isinstance(raw_features, np.ndarray) and raw_features.dtype == object and raw_features.ndim == 0:
+            raw_features = raw_features.item()
+
+        if isinstance(raw_features, dict):
+            raw_timestamps = raw_features.get('timestamps', raw_features.get('video_timestamps', raw_timestamps))
+            raw_labels = raw_features.get('distance_labels', raw_features.get('video_distance_labels', raw_labels))
+            raw_features = raw_features.get('features', raw_features.get('video_features', raw_features.get('feat')))
+
+        if raw_features is None:
+            return video_features, video_feature_mask, video_timestamps, video_distance_labels
+
+        raw_features = np.asarray(raw_features)
+        if raw_features.ndim == 1:
+            raw_features = raw_features[None, :]
+
+        num_frames = raw_features.shape[0]
+        sampled_inds = self._sample_video_indices(num_frames)
+        raw_features = raw_features[sampled_inds]
+
+        if raw_features.shape[-1] >= self.video_input_dim:
+            raw_features = raw_features[..., :self.video_input_dim]
+        else:
+            padded_features = np.zeros((raw_features.shape[0], self.video_input_dim), dtype=np.float32)
+            padded_features[..., :raw_features.shape[-1]] = raw_features
+            raw_features = padded_features
+
+        if raw_timestamps is None:
+            raw_timestamps = sampled_inds.astype(np.float32)
+        else:
+            raw_timestamps = np.asarray(raw_timestamps).reshape(-1)[sampled_inds]
+
+        if raw_labels is not None:
+            raw_labels = np.asarray(raw_labels)
+            if raw_labels.ndim == 0:
+                raw_labels = np.full((num_frames,), int(raw_labels), dtype=np.int64)
+            raw_labels = raw_labels.reshape(-1)
+            raw_labels = raw_labels[sampled_inds]
+        else:
+            raw_labels = np.full((len(sampled_inds),), -100, dtype=np.int64)
+
+        valid_count = min(len(sampled_inds), self.video_num_points)
+        video_features[:valid_count] = raw_features[:valid_count]
+        video_timestamps[:valid_count] = raw_timestamps[:valid_count].astype(np.float32)
+        video_distance_labels[:valid_count] = raw_labels[:valid_count].astype(np.int64)
+        video_feature_mask[:valid_count] = True
+        return video_features, video_feature_mask, video_timestamps, video_distance_labels
     # data
     def get_other(self,index):
         """Get current batch for input index."""
@@ -456,6 +570,8 @@ class Joint3DDataset(Dataset):
             all_detected_bboxes, all_detected_bbox_label_mask,
             detected_class_ids
         ) = self._get_detected_objects(split, anno['scan_id'], augmentations)
+        video_features, video_feature_mask, video_timestamps, video_distance_labels = \
+            self._load_video_inputs(anno, anno['scan_id'])
         obj_boxes = all_detected_bboxes
         obj_mask = all_detected_bbox_label_mask
         ious, _ = _iou3d_par(
@@ -484,6 +600,11 @@ class Joint3DDataset(Dataset):
             "all_detected_boxes": all_detected_bboxes.astype(np.float32),
             "all_detected_bbox_label_mask": all_detected_bbox_label_mask.astype(np.bool8),
             "all_detected_class_ids": detected_class_ids.astype(np.int64),
+            "video_features": video_features.astype(np.float32),
+            "video_feature_mask": video_feature_mask.astype(np.bool8),
+            "video_timestamps": video_timestamps.astype(np.float32),
+            "video_distance_labels": video_distance_labels.astype(np.int64),
+            "video_distance_mask": video_feature_mask.astype(np.bool8),
         }
         return ret_dict
     def get_scannetpp(self,index):
@@ -509,6 +630,8 @@ class Joint3DDataset(Dataset):
             all_detected_bboxes, all_detected_bbox_label_mask,
             detected_class_ids
         ) = self._get_detected_objects_pp(split, anno['scene_id'], augmentations)
+        video_features, video_feature_mask, video_timestamps, video_distance_labels = \
+            self._load_video_inputs(anno, anno['scene_id'])
         obj_boxes = all_detected_bboxes
         obj_mask = all_detected_bbox_label_mask
         ious, _ = _iou3d_par(
@@ -537,6 +660,11 @@ class Joint3DDataset(Dataset):
             "all_detected_boxes": all_detected_bboxes.astype(np.float32),
             "all_detected_bbox_label_mask": all_detected_bbox_label_mask.astype(np.bool8),
             "all_detected_class_ids": detected_class_ids.astype(np.int64),
+            "video_features": video_features.astype(np.float32),
+            "video_feature_mask": video_feature_mask.astype(np.bool8),
+            "video_timestamps": video_timestamps.astype(np.float32),
+            "video_distance_labels": video_distance_labels.astype(np.int64),
+            "video_distance_mask": video_feature_mask.astype(np.bool8),
         }
         return ret_dict
     def __getitem__(self, index):

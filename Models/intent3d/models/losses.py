@@ -718,6 +718,7 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
     # total loss
     tgt_obj_cls_loss = bce(end_points)
     tgt_obj_cls_loss = tgt_obj_cls_loss*20
+    loss_video_distance = video_distance_loss(end_points)
     query_points_generation_loss = 8 * query_points_generation_loss
     loss_ce = 1.0 / (num_decoder_layers + 1) * loss_ce              
     loss_bbox = 1.0 / (num_decoder_layers + 1) * 5 * loss_bbox
@@ -730,7 +731,7 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
     query_points_generation_loss = query_points_generation_loss * 10
     loss_vo = loss_vo * 0.5
     loss = query_points_generation_loss + loss_ce + loss_bbox + loss_giou + \
-                    loss_sem_align + loss_vo + tgt_obj_cls_loss
+                    loss_sem_align + loss_vo + tgt_obj_cls_loss + loss_video_distance
 
     end_points['loss_ce'] = loss_ce
     end_points['loss_bbox'] = loss_bbox
@@ -739,6 +740,7 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
     end_points['loss_sem_align'] = loss_sem_align
     end_points['loss_vo'] = loss_vo
     end_points['loss_tgt_obj_cls'] = tgt_obj_cls_loss
+    end_points['loss_video_distance'] = loss_video_distance
     end_points['loss'] = loss
     return loss, end_points
 
@@ -758,3 +760,33 @@ def bce(end_points):
         total_loss += loss_sum / (mask.sum().float() + 1e-6)
 
     return total_loss
+
+
+def video_distance_loss(end_points):
+    if 'video_distance_logits' not in end_points:
+        return 0.0
+    if 'video_distance_labels' not in end_points:
+        return 0.0
+
+    logits = end_points['video_distance_logits']
+    labels = end_points['video_distance_labels']
+    mask = end_points.get('video_distance_mask')
+
+    if labels.dim() == 1:
+        valid = labels >= 0
+        if valid.sum() == 0:
+            return 0.0
+        return F.cross_entropy(logits[valid], labels[valid].long())
+
+    if mask is None:
+        mask = labels >= 0
+    else:
+        mask = mask.bool() & (labels >= 0)
+
+    if mask.sum() == 0:
+        return 0.0
+
+    flat_logits = logits.reshape(-1, logits.shape[-1])
+    flat_labels = labels.reshape(-1).long()
+    flat_mask = mask.reshape(-1)
+    return F.cross_entropy(flat_logits[flat_mask], flat_labels[flat_mask])
