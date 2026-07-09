@@ -1,0 +1,149 @@
+[
+  {
+    "sample_id": "sample_000000",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170.jpg"
+  },
+  {
+    "sample_id": "sample_000001",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000002",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220.jpg"
+  },
+  {
+    "sample_id": "sample_000003",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000004",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5310_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5310_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5310_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000005",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520.jpg"
+  },
+  {
+    "sample_id": "sample_000006",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_2520_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000007",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180.jpg"
+  },
+  {
+    "sample_id": "sample_000008",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010035_9180_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000009",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050.jpg"
+  },
+  {
+    "sample_id": "sample_000010",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_4050_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000011",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90.jpg"
+  },
+  {
+    "sample_id": "sample_000012",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010036_90_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000013",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420.jpg"
+  },
+  {
+    "sample_id": "sample_000014",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010053_3420_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000015",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070.jpg"
+  },
+  {
+    "sample_id": "sample_000016",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010054_2070_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000017",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180.jpg"
+  },
+  {
+    "sample_id": "sample_000018",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_180_effect.jpg"
+  },
+  {
+    "sample_id": "sample_000019",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540.jpg"
+  },
+  {
+    "sample_id": "sample_000020",
+    "item_type": "image",
+    "video_file_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540_effect.jpg",
+    "video_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540_effect.jpg",
+    "video_file": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010055_540_effect.jpg"
+  }
+]

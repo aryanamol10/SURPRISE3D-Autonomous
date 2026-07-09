@@ -13,7 +13,6 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.nn as nn
-from transformers import RobertaModel, RobertaTokenizerFast
 import pdb
 from .backbone_module import Pointnet2Backbone
 from .modules import (
@@ -24,6 +23,12 @@ from .video_encoder import VideoEncoder
 from .encoder_decoder_layers import (
     BiEncoder, BiEncoderLayer, BiDecoderLayer
 )
+
+try:
+    from transformers import RobertaModel, RobertaTokenizerFast
+except Exception:
+    RobertaModel = None
+    RobertaTokenizerFast = None
 
 class BeaUTyDETR(nn.Module):
     def __init__(self, num_class=256, num_obj_class=485,
@@ -37,7 +42,8 @@ class BeaUTyDETR(nn.Module):
                  video_input_dim=256,
                  video_hidden_dim=256,
                  video_num_layers=2,
-                 video_distance_classes=8):
+                 video_distance_classes=8,
+                 video_only=False):
         """Initialize layers."""
         super().__init__()
 
@@ -46,6 +52,35 @@ class BeaUTyDETR(nn.Module):
         self.self_position_embedding = self_position_embedding
         self.contrastive_align_loss = contrastive_align_loss
         self.use_video_encoder = use_video_encoder
+        self.video_only = video_only
+
+        if self.video_only and not self.use_video_encoder:
+            raise ValueError("video_only requires use_video_encoder=True")
+
+        if self.video_only:
+            self.video_encoder = VideoEncoder(
+                input_dim=video_input_dim,
+                d_model=d_model,
+                hidden_dim=video_hidden_dim,
+                num_layers=video_num_layers,
+            )
+            self.video_context_projector = nn.Sequential(
+                nn.Linear(d_model, d_model),
+                nn.LayerNorm(d_model, eps=1e-12),
+                nn.ReLU(inplace=True),
+            )
+            self.video_distance_head = nn.Sequential(
+                nn.Linear(d_model, d_model),
+                nn.ReLU(inplace=True),
+                nn.Linear(d_model, video_distance_classes),
+            )
+            self.init_bn_momentum()
+            return
+
+        if RobertaModel is None or RobertaTokenizerFast is None:
+            raise RuntimeError(
+                "transformers is required for the full text-based BeaUTyDETR model"
+            )
 
         # Visual encoder
         self.backbone_net = Pointnet2Backbone(
@@ -199,33 +234,31 @@ class BeaUTyDETR(nn.Module):
         encoded_text = self.text_encoder(**tokenized)
         text_feats = self.text_projector(encoded_text.last_hidden_state)
 
-        if self.use_video_encoder and 'video_features' in inputs:
-            video_mask = inputs.get('video_feature_mask')
-            video_timestamps = inputs.get('video_timestamps')
-            if video_mask is not None and video_mask.any():
+        if self.use_video_encoder and ('video_frames' in inputs or 'video_features' in inputs):
+            if 'video_frame_mask' in inputs and inputs['video_frame_mask'].any():
+                video_source = inputs['video_frames']
+                video_mask = inputs['video_frame_mask']
+                video_timestamps = inputs.get('video_timestamps')
                 video_feats, video_pooled = self.video_encoder(
-                    inputs['video_features'],
+                    video_frames=video_source,
                     video_mask=video_mask,
                     video_timestamps=video_timestamps,
                 )
-                video_distance_logits = self.video_distance_head(video_feats)
-                video_context = self.video_context_projector(video_pooled).unsqueeze(1)
+            elif 'video_feature_mask' in inputs and inputs['video_feature_mask'].any():
+                video_source = inputs['video_features']
+                video_mask = inputs['video_feature_mask']
+                video_timestamps = inputs.get('video_timestamps')
+                video_feats, video_pooled = self.video_encoder(
+                    video_features=video_source,
+                    video_mask=video_mask,
+                    video_timestamps=video_timestamps,
+                )
             else:
-                video_feats = inputs['video_features'].new_zeros(
-                    inputs['video_features'].shape[0],
-                    inputs['video_features'].shape[1],
-                    self.text_projector[0].out_features,
-                )
-                video_context = inputs['video_features'].new_zeros(
-                    inputs['video_features'].shape[0],
-                    1,
-                    self.text_projector[0].out_features,
-                )
-                video_distance_logits = inputs['video_features'].new_zeros(
-                    inputs['video_features'].shape[0],
-                    inputs['video_features'].shape[1],
-                    self.video_distance_head[-1].out_features,
-                )
+                video_feats = text_feats.new_zeros(text_feats.shape[0], 1, text_feats.shape[-1])
+                video_pooled = text_feats.new_zeros(text_feats.shape[0], text_feats.shape[-1])
+
+            video_distance_logits = self.video_distance_head(video_feats)
+            video_context = self.video_context_projector(video_pooled).unsqueeze(1)
             end_points['video_feats'] = video_feats
             end_points['video_distance_logits'] = video_distance_logits
             text_feats = text_feats + video_context
@@ -263,6 +296,34 @@ class BeaUTyDETR(nn.Module):
         end_points['query_points_feature'] = features  # (B, F, V)
         end_points['query_points_sample_inds'] = sample_inds  # (B, V)
         return end_points
+
+    def forward_video_only(self, video_frames=None, video_features=None,
+                           video_mask=None, video_timestamps=None):
+        """Run the optional video branch without the 3D detector path."""
+        if not self.use_video_encoder:
+            raise RuntimeError("Video-only inference requires use_video_encoder=True")
+
+        if video_frames is not None:
+            video_feats, video_pooled = self.video_encoder(
+                video_frames=video_frames,
+                video_mask=video_mask,
+                video_timestamps=video_timestamps,
+            )
+        elif video_features is not None:
+            video_feats, video_pooled = self.video_encoder(
+                video_features=video_features,
+                video_mask=video_mask,
+                video_timestamps=video_timestamps,
+            )
+        else:
+            raise ValueError("Either video_frames or video_features must be provided")
+
+        logits = self.video_distance_head(video_feats)
+        return {
+            'video_feats': video_feats,
+            'video_pooled': video_pooled,
+            'video_distance_logits': logits,
+        }
     
     # forward.
     def forward(self, inputs):

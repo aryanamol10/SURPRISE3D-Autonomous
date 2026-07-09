@@ -1,0 +1,111 @@
+[
+  {
+    "media_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170.jpg",
+    "frame_index": 0,
+    "detections": [
+      {
+        "box": [
+          545.7373657226562,
+          1179.0511474609375,
+          671.8079833984375,
+          1266.101806640625
+        ],
+        "label": "car",
+        "score": 0.7827632427215576,
+        "distance_class": 6,
+        "distance_label": "dist_6",
+        "distance_score": 0.807938243519293
+      },
+      {
+        "box": [
+          423.087158203125,
+          1199.3858642578125,
+          607.4586181640625,
+          1308.9698486328125
+        ],
+        "label": "car",
+        "score": 0.6772266030311584,
+        "distance_class": 6,
+        "distance_label": "dist_6",
+        "distance_score": 0.7938381212217659
+      },
+      {
+        "box": [
+          0.0,
+          1182.5511474609375,
+          321.0172119140625,
+          1363.0789794921875
+        ],
+        "label": "car",
+        "score": 0.6561307311058044,
+        "distance_class": 6,
+        "distance_label": "dist_6",
+        "distance_score": 0.7525322608413907
+      }
+    ]
+  },
+  {
+    "media_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010006_1170_effect.jpg",
+    "frame_index": 0,
+    "detections": [
+      {
+        "box": [
+          574.5245971679688,
+          1170.418701171875,
+          695.8964233398438,
+          1265.3607177734375
+        ],
+        "label": "car",
+        "score": 0.7438015341758728,
+        "distance_class": 6,
+        "distance_label": "dist_6",
+        "distance_score": 0.8080711598182793
+      },
+      {
+        "box": [
+          0.0,
+          1174.681640625,
+          356.6383361816406,
+          1365.0989990234375
+        ],
+        "label": "car",
+        "score": 0.6692595481872559,
+        "distance_class": 5,
+        "distance_label": "dist_5",
+        "distance_score": 0.7427961562756528
+      },
+      {
+        "box": [
+          436.90234375,
+          1194.1380615234375,
+          651.5182495117188,
+          1314.875732421875
+        ],
+        "label": "car",
+        "score": 0.6074292063713074,
+        "distance_class": 6,
+        "distance_label": "dist_6",
+        "distance_score": 0.7879603445495862
+      }
+    ]
+  },
+  {
+    "media_path": "D:\\UC_Merced_COSMOS\\SURPRISE3D-Autonomous\\Models\\intent3d\\data\\city_media\\videos\\GH010007_5220.jpg",
+    "frame_index": 0,
+    "detections": [
+      {
+        "box": [
+          543.251220703125,
+          1040.2777099609375,
+          999.3516235351562,
+          1352.1685791015625
+        ],
+        "label": "truck",
+        "score": 0.8151070475578308,
+        "distance_class": 5,
+        "distance_label": "dist_5",
+        "distance_score": 0.6777737232097693
+      }
+    ]
+  }
+]
